@@ -1,6 +1,6 @@
-## Laravel Implementation of Rails Tutorial Sample App
+## Laravel Implementation of Laravel Tutorial Sample App
 
-I've created a Laravel application that replicates the functionality of the Ruby on Rails tutorial sample app. The implementation includes:
+I've created a Laravel application that replicates the functionality of the Laravel tutorial sample app. The implementation includes:
 
 ### Core Features
 
@@ -62,7 +62,7 @@ The Laravel application follows the MVC architecture:
 
 1. **Authentication**:
 
-1. Custom authentication system similar to Rails
+1. Custom authentication system similar to Laravel
 2. Account activation via email
 3. Remember token for persistent sessions
 4. Password reset functionality

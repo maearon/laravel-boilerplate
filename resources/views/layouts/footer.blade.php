@@ -10,7 +10,7 @@
                 </p>
             </div>
             <div class="col-md-6 text-end">
-                <h5>Rails Tutorial</h5>
+                <h5>Laravel Tutorial</h5>
                 <p>
                     This is the sample application for the tutorial.
                 </p>

@@ -11,11 +11,11 @@
 <body>
     @include('layouts.header')
 
-    <div class="container">
+    <div class="container main-content">
         @include('shared.flash_messages')
-        
+
         @yield('content')
-        
+
         @include('layouts.footer')
     </div>
 

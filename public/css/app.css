@@ -1,8 +1,21 @@
 /* General */
+html, body {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+}
+
 body {
-    padding-top: 60px;
-    padding-bottom: 100px;
-  }
+  height: 100%;               /* Đảm bảo 100% chiều cao */
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  /* font-family: "Arial Narrow", "Helvetica", "Arial", sans-serif; */
+  background-color: #fff;
+  color: #333;
+}
+
 
   section {
     overflow: auto;
@@ -68,13 +81,31 @@ body {
     text-decoration: none;
   }
 
-  /* Footer */
+
+/* Đảm bảo phần main chiếm hết khoảng trống còn lại giữa header và footer */
+.main-content {
+  flex: 1;
+  padding-top: 30px;
+  padding-bottom: 30px;
+}
+
+  /* Footer cố định dưới cùng khi nội dung ngắn */
   footer {
+  border-top: 1px solid #eaeaea;
+  margin-top: 45px;
+  padding-top: 5px;
+  /* text-align: center; */
+  color: #777;
+  /* background: #f9f9f9; */
+  }
+
+  /* Footer */
+  /* footer {
     margin-top: 45px;
     padding-top: 5px;
     border-top: 1px solid #eaeaea;
     color: #777;
-  }
+  } */
 
   footer a {
     color: #555;
