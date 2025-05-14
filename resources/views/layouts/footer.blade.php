@@ -6,7 +6,8 @@
                 <p>
                     <a href="{{ route('about') }}">About</a>
                     <a href="{{ route('contact') }}">Contact</a>
-                    <a href="https://news.railstutorial.org/">News</a>
+                    <a href="https://laravel-news.com/">News</a>
+                    <a href="https://cloud.laravel.com/">Cloud</a>
                 </p>
             </div>
             <div class="col-md-6 text-end">
