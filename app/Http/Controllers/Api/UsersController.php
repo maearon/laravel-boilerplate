@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
+use App\Http\Resources\UserResource;
 
 class UsersController extends Controller
 {
@@ -15,7 +16,8 @@ class UsersController extends Controller
     public function index()
     {
         $users = User::where('activated', true)->paginate(10);
-        return response()->json($users);
+        // return response()->json($users);
+        return UserResource::collection($users);
     }
 
     /**

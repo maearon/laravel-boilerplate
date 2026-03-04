@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Routing\Controller;
+use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -31,6 +31,7 @@ class SessionsController extends Controller
      */
     public function store(Request $request)
     {
+        // dd($request);
         $this->validate($request, [
             'email' => 'required|email',
             'password' => 'required',

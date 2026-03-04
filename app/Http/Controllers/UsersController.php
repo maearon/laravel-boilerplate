@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Routing\Controller;
+use App\Http\Controllers\Controller;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
@@ -56,6 +56,7 @@ class UsersController extends Controller
      */
     public function store(Request $request)
     {
+        // dump($request);
         $this->validate($request, [
             'name' => 'required|max:50',
             'email' => 'required|email|max:255|unique:users',

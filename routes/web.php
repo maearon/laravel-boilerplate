@@ -1,5 +1,6 @@
 <?php
 
+use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\StaticPagesController;
 use App\Http\Controllers\UsersController;
@@ -13,6 +14,10 @@ use App\Http\Controllers\PasswordResetsController;
 | Web Routes
 |--------------------------------------------------------------------------
 */
+
+Route::get('/version', function () {
+    return Application::VERSION;
+});
 
 // Static pages
 Route::get('/', [StaticPagesController::class, 'home'])->name('root');
