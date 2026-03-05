@@ -11,6 +11,7 @@ class UserService
 {
     public function __construct(
         private readonly UserRepositoryInterface $users,
+        private readonly CacheService $cache,
     ) {}
 
     public function paginateActivated(int $perPage = 10): LengthAwarePaginator
@@ -20,13 +21,17 @@ class UserService
 
     public function createActivated(array $data): User
     {
-        return $this->users->create([
+        $user = $this->users->create([
             'name' => $data['name'],
             'email' => $data['email'],
             'password' => Hash::make($data['password']),
             'activated' => true,
             'activated_at' => now(),
         ]);
+
+        $this->cache->forgetUsersList();
+
+        return $user;
     }
 
     public function update(User $user, array $data): User
@@ -42,12 +47,20 @@ class UserService
 
         $this->users->update($user, $attributes);
 
+        $this->cache->forgetUsersList();
+        $this->cache->forgetUserProfile($user->id);
+        $this->cache->forgetUserStats($user->id);
+
         return $user;
     }
 
     public function delete(User $user): void
     {
         $this->users->delete($user);
+
+        $this->cache->forgetUsersList();
+        $this->cache->forgetUserProfile($user->id);
+        $this->cache->forgetUserStats($user->id);
     }
 
     public function paginateMicroposts(User $user, int $perPage = 10): LengthAwarePaginator

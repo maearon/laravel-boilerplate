@@ -12,10 +12,12 @@ use App\Http\Controllers\Api\SessionsController;
 |--------------------------------------------------------------------------
 */
 
-// Public routes
-Route::post('/login', [SessionsController::class, 'login']);
+// Public routes (stricter rate limit for auth)
+Route::middleware('throttle:login')->group(function () {
+    Route::post('/login', [SessionsController::class, 'login']);
+});
 
-// Protected routes
+// Protected routes (throttle:api applied by default)
 Route::middleware('auth:sanctum')->group(function () {
     Route::post('/logout', [SessionsController::class, 'logout']);
 

@@ -21,8 +21,9 @@ class UsersController extends Controller
      */
     public function index(Request $request)
     {
+        $perPage = min((int) $request->get('per_page', 10), 50);
         $page = (int) $request->get('page', 1);
-        $users = $this->cacheService->rememberUsersList(10, $page);
+        $users = $this->cacheService->rememberUsersList($perPage, $page);
 
         return UserResource::collection($users);
     }

@@ -12,6 +12,7 @@ class MicropostService
 {
     public function __construct(
         private readonly MicropostRepositoryInterface $microposts,
+        private readonly CacheService $cache,
     ) {}
 
     public function paginateLatestWithUser(int $perPage = 10): LengthAwarePaginator
@@ -30,7 +31,11 @@ class MicropostService
             $attributes['image'] = $image->store('microposts', 'public');
         }
 
-        return $this->microposts->create($attributes);
+        $micropost = $this->microposts->create($attributes);
+
+        $this->cache->forgetMicropostsIndex();
+
+        return $micropost;
     }
 
     public function updateContent(Micropost $micropost, string $content): Micropost
@@ -49,6 +54,8 @@ class MicropostService
         }
 
         $this->microposts->delete($micropost);
+
+        $this->cache->forgetMicropostsIndex();
     }
 }
 

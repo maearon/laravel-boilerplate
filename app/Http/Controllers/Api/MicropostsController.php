@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Models\Micropost;
+use App\Services\CacheService;
 use App\Services\MicropostService;
 use Illuminate\Http\Request;
 
@@ -11,14 +12,18 @@ class MicropostsController extends Controller
 {
     public function __construct(
         private readonly MicropostService $micropostService,
+        private readonly CacheService $cacheService,
     ) {}
 
     /**
      * Display a listing of the microposts.
      */
-    public function index()
+    public function index(Request $request)
     {
-        $microposts = $this->micropostService->paginateLatestWithUser(10);
+        $perPage = min((int) $request->get('per_page', 10), 50);
+        $page = (int) $request->get('page', 1);
+        $microposts = $this->cacheService->rememberMicropostsIndex($perPage, $page);
+
         return response()->json($microposts);
     }
 
