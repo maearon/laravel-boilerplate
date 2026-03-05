@@ -21,17 +21,17 @@ return new class extends Migration
         //     created_at INTEGER NOT NULL
         // );
         // CREATE INDEX jobs_queue_index ON jobs(queue);
-        // Schema::create('jobs', function (Blueprint $table) {
-        //     $table->id();
-        //     $table->string('queue')->index();
-        //     $table->longText('payload');
-        //     $table->unsignedTinyInteger('attempts');
-        //     $table->unsignedInteger('reserved_at')->nullable();
-        //     $table->unsignedInteger('available_at');
-        //     $table->unsignedInteger('created_at');
-        // });
+        Schema::create('jobs', function (Blueprint $table) {
+            $table->id();
+            $table->string('queue')->index();
+            $table->longText('payload');
+            $table->unsignedTinyInteger('attempts');
+            $table->unsignedInteger('reserved_at')->nullable();
+            $table->unsignedInteger('available_at');
+            $table->unsignedInteger('created_at');
+        });
 
-        // ALTER TABLE jobs ADD COLUMN queue VARCHAR NOT NULL;
+        //ALTER TABLE jobs ADD COLUMN queue VARCHAR NOT NULL;
         // CREATE INDEX jobs_queue_index ON jobs(queue);
 
         // ALTER TABLE jobs ADD COLUMN payload TEXT NOT NULL;
@@ -59,18 +59,18 @@ return new class extends Migration
         //     finished_at INTEGER
         // );
 
-        // Schema::create('job_batches', function (Blueprint $table) {
-        //     $table->string('id')->primary();
-        //     $table->string('name');
-        //     $table->integer('total_jobs');
-        //     $table->integer('pending_jobs');
-        //     $table->integer('failed_jobs');
-        //     $table->longText('failed_job_ids');
-        //     $table->mediumText('options')->nullable();
-        //     $table->integer('cancelled_at')->nullable();
-        //     $table->integer('created_at');
-        //     $table->integer('finished_at')->nullable();
-        // });
+        Schema::create('job_batches', function (Blueprint $table) {
+            $table->string('id')->primary();
+            $table->string('name');
+            $table->integer('total_jobs');
+            $table->integer('pending_jobs');
+            $table->integer('failed_jobs');
+            $table->longText('failed_job_ids');
+            $table->mediumText('options')->nullable();
+            $table->integer('cancelled_at')->nullable();
+            $table->integer('created_at');
+            $table->integer('finished_at')->nullable();
+        });
 
         // ALTER TABLE job_batches ADD COLUMN name VARCHAR NOT NULL;
 
@@ -106,15 +106,15 @@ return new class extends Migration
         //     failed_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
         // );
 
-        // Schema::create('failed_jobs', function (Blueprint $table) {
-        //     $table->id();
-        //     $table->string('uuid')->unique();
-        //     $table->text('connection');
-        //     $table->text('queue');
-        //     $table->longText('payload');
-        //     $table->longText('exception');
-        //     $table->timestamp('failed_at')->useCurrent();
-        // });
+        Schema::create('failed_jobs', function (Blueprint $table) {
+            $table->id();
+            $table->string('uuid')->unique();
+            $table->text('connection');
+            $table->text('queue');
+            $table->longText('payload');
+            $table->longText('exception');
+            $table->timestamp('failed_at')->useCurrent();
+        });
 
         // ALTER TABLE failed_jobs ADD COLUMN uuid VARCHAR UNIQUE NOT NULL;
 
@@ -135,8 +135,8 @@ return new class extends Migration
      */
     public function down(): void
     {
-        // Schema::dropIfExists('jobs');
-        // Schema::dropIfExists('job_batches');
-        // Schema::dropIfExists('failed_jobs');
+        Schema::dropIfExists('jobs');
+        Schema::dropIfExists('job_batches');
+        Schema::dropIfExists('failed_jobs');
     }
 };

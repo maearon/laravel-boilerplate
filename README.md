@@ -113,7 +113,10 @@ php artisan vendor:publish --provider="Laravel\Sanctum\SanctumServiceProvider"
 php artisan migrate (personal_access_tokens)
 php artisan make:resource UserResource
 php artisan serve
-
+php artisan key:generate
+php artisan config:clear
+php artisan cache:clear
+php artisan queue:work
 
 Ok mình nói thẳng luôn nhé 👇
 Với JD này và còn 1 tuần, nếu ôn đúng trọng tâm thì vẫn kịp cho level Middle, còn Senior thì phụ thuộc nền tảng hiện tại của bạn.
