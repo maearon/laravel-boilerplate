@@ -49,6 +49,8 @@ class UsersController extends Controller
      */
     public function show(User $user)
     {
+        $user = $this->cacheService->rememberUserProfile($user->id, fn () => $user->toArray());
+
         return response()->json($user);
     }
 
@@ -79,27 +81,36 @@ class UsersController extends Controller
     /**
      * Display the microposts for the specified user.
      */
-    public function microposts(User $user)
+    public function microposts(Request $request, User $user)
     {
-        $microposts = $this->userService->paginateMicroposts($user, 10);
+        $perPage = min((int) $request->get('per_page', 10), 50);
+        $page = (int) $request->get('page', 1);
+        $microposts = $this->cacheService->rememberUserMicroposts($user->id, $perPage, $page);
+
         return response()->json($microposts);
     }
 
     /**
      * Display the users that the specified user is following.
      */
-    public function following(User $user)
+    public function following(Request $request, User $user)
     {
-        $following = $this->userService->paginateFollowing($user, 10);
+        $perPage = min((int) $request->get('per_page', 10), 50);
+        $page = (int) $request->get('page', 1);
+        $following = $this->cacheService->rememberUserFollowing($user->id, $perPage, $page);
+
         return response()->json($following);
     }
 
     /**
      * Display the users that are following the specified user.
      */
-    public function followers(User $user)
+    public function followers(Request $request, User $user)
     {
-        $followers = $this->userService->paginateFollowers($user, 10);
+        $perPage = min((int) $request->get('per_page', 10), 50);
+        $page = (int) $request->get('page', 1);
+        $followers = $this->cacheService->rememberUserFollowers($user->id, $perPage, $page);
+
         return response()->json($followers);
     }
 }

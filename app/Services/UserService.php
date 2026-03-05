@@ -50,6 +50,7 @@ class UserService
         $this->cache->forgetUsersList();
         $this->cache->forgetUserProfile($user->id);
         $this->cache->forgetUserStats($user->id);
+        $this->cache->forgetCurrentUser($user->id);
 
         return $user;
     }
@@ -61,6 +62,7 @@ class UserService
         $this->cache->forgetUsersList();
         $this->cache->forgetUserProfile($user->id);
         $this->cache->forgetUserStats($user->id);
+        $this->cache->forgetCurrentUser($user->id);
     }
 
     public function paginateMicroposts(User $user, int $perPage = 10): LengthAwarePaginator

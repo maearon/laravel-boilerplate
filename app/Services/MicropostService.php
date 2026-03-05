@@ -34,6 +34,7 @@ class MicropostService
         $micropost = $this->microposts->create($attributes);
 
         $this->cache->forgetMicropostsIndex();
+        $this->cache->forgetUserMicroposts($userId);
 
         return $micropost;
     }
@@ -43,6 +44,8 @@ class MicropostService
         $this->microposts->update($micropost, [
             'content' => $content,
         ]);
+
+        $this->cache->forgetMicropostShow($micropost->id);
 
         return $micropost;
     }
@@ -56,6 +59,8 @@ class MicropostService
         $this->microposts->delete($micropost);
 
         $this->cache->forgetMicropostsIndex();
+        $this->cache->forgetUserMicroposts($micropost->user_id);
+        $this->cache->forgetMicropostShow($micropost->id);
     }
 }
 

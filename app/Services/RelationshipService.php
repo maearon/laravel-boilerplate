@@ -10,6 +10,7 @@ class RelationshipService
 {
     public function __construct(
         private readonly UserRepositoryInterface $users,
+        private readonly CacheService $cache,
     ) {}
 
     public function follow(User $actor, int $followedId): void
@@ -19,6 +20,8 @@ class RelationshipService
 
         Cache::forget("user:{$actor->id}:stats");
         Cache::forget("user:{$user->id}:stats");
+        $this->cache->forgetUserFollowing($actor->id);
+        $this->cache->forgetUserFollowers($user->id);
     }
 
     public function unfollow(User $actor, int $followedId): void
@@ -28,6 +31,8 @@ class RelationshipService
 
         Cache::forget("user:{$actor->id}:stats");
         Cache::forget("user:{$user->id}:stats");
+        $this->cache->forgetUserFollowing($actor->id);
+        $this->cache->forgetUserFollowers($user->id);
     }
 }
 

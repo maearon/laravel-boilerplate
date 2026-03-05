@@ -51,9 +51,13 @@ class MicropostsController extends Controller
      */
     public function show(Micropost $micropost)
     {
-        $micropost->loadMissing('user:id,name,email');
+        $data = $this->cacheService->rememberMicropostShow($micropost->id, function () use ($micropost) {
+            $micropost->loadMissing('user:id,name,email');
 
-        return response()->json($micropost);
+            return $micropost->toArray();
+        });
+
+        return response()->json($data);
     }
 
     /**

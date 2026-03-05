@@ -37,7 +37,5 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::put('/microposts/{micropost}', [MicropostsController::class, 'update']);
     Route::delete('/microposts/{micropost}', [MicropostsController::class, 'destroy']);
 
-    Route::get('/user', function (Request $request) {
-        return $request->user();
-    });
+    Route::get('/user', [\App\Http\Controllers\Api\CurrentUserController::class, 'show']);
 });
