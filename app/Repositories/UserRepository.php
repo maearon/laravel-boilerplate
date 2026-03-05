@@ -11,6 +11,7 @@ class UserRepository implements UserRepositoryInterface
     public function paginateActivated(int $perPage = 10): LengthAwarePaginator
     {
         return User::query()
+            ->select(['id', 'name', 'email', 'activated', 'created_at'])
             ->where('activated', true)
             ->paginate($perPage);
     }
@@ -64,17 +65,23 @@ class UserRepository implements UserRepositoryInterface
 
     public function paginateMicroposts(User $user, int $perPage = 10): LengthAwarePaginator
     {
-        return $user->microposts()->paginate($perPage);
+        return $user->microposts()
+            ->with(['user:id,name,email'])
+            ->paginate($perPage);
     }
 
     public function paginateFollowing(User $user, int $perPage = 10): LengthAwarePaginator
     {
-        return $user->following()->paginate($perPage);
+        return $user->following()
+            ->select(['users.id', 'users.name', 'users.email', 'users.created_at'])
+            ->paginate($perPage);
     }
 
     public function paginateFollowers(User $user, int $perPage = 10): LengthAwarePaginator
     {
-        return $user->followers()->paginate($perPage);
+        return $user->followers()
+            ->select(['users.id', 'users.name', 'users.email', 'users.created_at'])
+            ->paginate($perPage);
     }
 }
 

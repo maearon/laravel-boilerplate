@@ -28,7 +28,7 @@ class AccountActivationService
 
     public function sendActivationEmail(User $user): void
     {
-        Mail::to($user->email)->send(new AccountActivation($user));
+        Mail::to($user->email)->queue(new AccountActivation($user));
     }
 
     public function activate(string $token): ?User

@@ -26,7 +26,7 @@ class PasswordResetService
         $user->reset_sent_at = now();
         $user->save();
 
-        Mail::to($user->email)->send(new PasswordReset($user));
+        Mail::to($user->email)->queue(new PasswordReset($user));
     }
 
     public function findValidUserByResetDigest(string $token, int $expiresHours = 2): ?User

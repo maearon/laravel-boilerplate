@@ -46,7 +46,9 @@ class MicropostsController extends Controller
      */
     public function show(Micropost $micropost)
     {
-        return response()->json($micropost->load('user'));
+        $micropost->loadMissing('user:id,name,email');
+
+        return response()->json($micropost);
     }
 
     /**

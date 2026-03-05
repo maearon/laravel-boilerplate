@@ -1,6 +1,13 @@
 @if (Auth::check() && Auth::id() !== $user->id)
     <div class="mb-3">
-        @if (Auth::user()->isFollowing($user))
+        @if (isset($followingIds) && $followingIds->contains($user->id))
+            <form method="POST" action="{{ route('relationships.destroy') }}">
+                @csrf
+                @method('DELETE')
+                <input type="hidden" name="followed_id" value="{{ $user->id }}">
+                <button type="submit" class="btn btn-sm btn-outline-primary">Unfollow</button>
+            </form>
+        @elseif (!isset($followingIds) && Auth::user()->isFollowing($user))
             <form method="POST" action="{{ route('relationships.destroy') }}">
                 @csrf
                 @method('DELETE')

@@ -37,9 +37,11 @@ class UsersController extends Controller
     public function index()
     {
         $users = $this->userService->paginateActivated(10);
+        $followingIds = $this->userService->getFollowingIdsFor(Auth::user());
 
         return view('users.index', [
-            'users' => $users
+            'users' => $users,
+            'followingIds' => $followingIds,
         ]);
     }
 
@@ -90,6 +92,7 @@ class UsersController extends Controller
      */
     public function show(User $user)
     {
+        $user->loadCount(['following', 'followers']);
         $microposts = $this->userService->paginateMicroposts($user, 10);
 
         return view('users.show', [
@@ -147,13 +150,15 @@ class UsersController extends Controller
      */
     public function following(User $user)
     {
+        $user->loadCount(['following', 'followers']);
         $users = $this->userService->paginateFollowing($user, 10);
-        $title = 'Following';
+        $followingIds = $this->userService->getFollowingIdsFor(Auth::user());
 
         return view('users.show_follow', [
             'user' => $user,
             'users' => $users,
-            'title' => $title
+            'title' => 'Following',
+            'followingIds' => $followingIds,
         ]);
     }
 
@@ -162,13 +167,15 @@ class UsersController extends Controller
      */
     public function followers(User $user)
     {
+        $user->loadCount(['following', 'followers']);
         $users = $this->userService->paginateFollowers($user, 10);
-        $title = 'Followers';
+        $followingIds = $this->userService->getFollowingIdsFor(Auth::user());
 
         return view('users.show_follow', [
             'user' => $user,
             'users' => $users,
-            'title' => $title
+            'title' => 'Followers',
+            'followingIds' => $followingIds,
         ]);
     }
 }

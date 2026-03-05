@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Models\User;
 use App\Repositories\Interfaces\UserRepositoryInterface;
+use Illuminate\Support\Facades\Cache;
 
 class RelationshipService
 {
@@ -15,12 +16,18 @@ class RelationshipService
     {
         $user = $this->users->findOrFail($followedId);
         $actor->follow($user);
+
+        Cache::forget("user:{$actor->id}:stats");
+        Cache::forget("user:{$user->id}:stats");
     }
 
     public function unfollow(User $actor, int $followedId): void
     {
         $user = $this->users->findOrFail($followedId);
         $actor->unfollow($user);
+
+        Cache::forget("user:{$actor->id}:stats");
+        Cache::forget("user:{$user->id}:stats");
     }
 }
 

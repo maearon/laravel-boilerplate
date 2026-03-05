@@ -11,8 +11,9 @@ class MicropostRepository implements MicropostRepositoryInterface
     public function paginateLatestWithUser(int $perPage = 10): LengthAwarePaginator
     {
         return Micropost::query()
-            ->with('user')
-            ->latest()
+            ->select(['id', 'content', 'user_id', 'image', 'created_at'])
+            ->with(['user:id,name,email'])
+            ->latest('created_at')
             ->paginate($perPage);
     }
 

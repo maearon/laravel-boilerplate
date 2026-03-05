@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Models\User;
+use App\Services\CacheService;
 use App\Services\UserService;
 use Illuminate\Http\Request;
 use App\Http\Resources\UserResource;
@@ -12,15 +13,17 @@ class UsersController extends Controller
 {
     public function __construct(
         private readonly UserService $userService,
+        private readonly CacheService $cacheService,
     ) {}
 
     /**
      * Display a listing of the users.
      */
-    public function index()
+    public function index(Request $request)
     {
-        $users = $this->userService->paginateActivated(10);
-        // return response()->json($users);
+        $page = (int) $request->get('page', 1);
+        $users = $this->cacheService->rememberUsersList(10, $page);
+
         return UserResource::collection($users);
     }
 

@@ -117,24 +117,19 @@ class User extends Authenticatable
 
     /**
      * Get the feed for the user.
+     * Eager loads user to prevent N+1 when rendering microposts.
      */
-    public function feed()
+    public function feed(int $perPage = 20)
     {
-        // $followingIds = $this->following()->pluck('users.id')->toArray();
-        // $followingIds[] = $this->id;
-
-        // return Micropost::whereIn('user_id', $followingIds)
-        //     ->orWhere('user_id', $this->id)
-        //     ->latest()
-        //     ->get();
-
-        return Micropost::whereIn('user_id', function ($query) {
-            $query->select('followed_id')
-                ->from('relationships')
-                ->where('follower_id', $this->id);
-        })
-        ->orWhere('user_id', $this->id)
-        ->latest()
-        ->paginate(20);
+        return Micropost::query()
+            ->with(['user:id,name,email'])
+            ->whereIn('user_id', function ($query) {
+                $query->select('followed_id')
+                    ->from('relationships')
+                    ->where('follower_id', $this->id);
+            })
+            ->orWhere('user_id', $this->id)
+            ->latest('created_at')
+            ->paginate($perPage);
     }
 }

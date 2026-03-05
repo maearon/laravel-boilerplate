@@ -64,5 +64,17 @@ class UserService
     {
         return $this->users->paginateFollowers($user, $perPage);
     }
+
+    /**
+     * Get IDs of users that the current user follows (for N+1 avoidance in list views).
+     */
+    public function getFollowingIdsFor(?User $user): \Illuminate\Support\Collection
+    {
+        if (!$user) {
+            return collect();
+        }
+
+        return $user->following()->pluck('users.id');
+    }
 }
 

@@ -16,7 +16,12 @@ class StaticPagesController extends Controller
      */
     public function home()
     {
-        $data = $this->staticPageService->homeDataFor(auth()->user());
+        $user = auth()->user();
+        if ($user) {
+            $user->loadCount(['following', 'followers']);
+        }
+
+        $data = $this->staticPageService->homeDataFor($user);
         if (!empty($data)) {
             return view('static_pages.home', $data);
         }
