@@ -3,14 +3,15 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
-use App\Models\User;
+use App\Services\AuthService;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Hash;
-use Illuminate\Validation\ValidationException;
 
 class SessionsController extends Controller
 {
+    public function __construct(
+        private readonly AuthService $authService,
+    ) {}
+
     /**
      * Handle a login request to the application.
      */
@@ -21,26 +22,12 @@ class SessionsController extends Controller
             'password' => 'required',
         ]);
 
-        $user = User::where('email', $request->email)->first();
+        $result = $this->authService->authenticateApi(
+            $request->string('email')->toString(),
+            $request->string('password')->toString(),
+        );
 
-        if (!$user || !Hash::check($request->password, $user->password)) {
-            throw ValidationException::withMessages([
-                'email' => ['The provided credentials are incorrect.'],
-            ]);
-        }
-
-        if (!$user->activated) {
-            throw ValidationException::withMessages([
-                'email' => ['This account is not activated.'],
-            ]);
-        }
-
-        $token = $user->createToken('api-token')->plainTextToken;
-
-        return response()->json([
-            'user' => $user,
-            'token' => $token,
-        ]);
+        return response()->json($result);
     }
 
     /**

@@ -120,12 +120,21 @@ class User extends Authenticatable
      */
     public function feed()
     {
-        $followingIds = $this->following()->pluck('users.id')->toArray();
-        $followingIds[] = $this->id;
+        // $followingIds = $this->following()->pluck('users.id')->toArray();
+        // $followingIds[] = $this->id;
 
-        return Micropost::whereIn('user_id', $followingIds)
-                        ->orWhere('user_id', $this->id)
-                        ->latest()
-                        ->get();
+        // return Micropost::whereIn('user_id', $followingIds)
+        //     ->orWhere('user_id', $this->id)
+        //     ->latest()
+        //     ->get();
+
+        return Micropost::whereIn('user_id', function ($query) {
+            $query->select('followed_id')
+                ->from('relationships')
+                ->where('follower_id', $this->id);
+        })
+        ->orWhere('user_id', $this->id)
+        ->latest()
+        ->paginate(20);
     }
 }

@@ -4,20 +4,20 @@ namespace App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
 use App\Models\User;
+use App\Services\AccountActivationService;
+use App\Services\UserService;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Auth;
-use App\Mail\AccountActivation;
-use Illuminate\Support\Facades\Mail;
-use Illuminate\Support\Str;
 
 class UsersController extends Controller
 {
+    public function __construct(
+        private readonly UserService $userService,
+        private readonly AccountActivationService $accountActivationService,
+    ) {
     /**
      * Create a new controller instance.
      */
-    public function __construct()
-    {
         $this->middleware('auth', [
             'except' => ['index', 'show', 'create', 'store', 'activate']
         ]);
@@ -36,7 +36,7 @@ class UsersController extends Controller
      */
     public function index()
     {
-        $users = User::where('activated', true)->paginate(10);
+        $users = $this->userService->paginateActivated(10);
 
         return view('users.index', [
             'users' => $users
@@ -63,15 +63,8 @@ class UsersController extends Controller
             'password' => 'required|min:6|confirmed',
         ]);
 
-        $user = User::create([
-            'name' => $request->name,
-            'email' => $request->email,
-            'password' => Hash::make($request->password),
-            'activation_digest' => Str::random(60),
-        ]);
-
-        // Send activation email
-        Mail::to($user->email)->send(new AccountActivation($user));
+        $user = $this->accountActivationService->register($request->only(['name', 'email', 'password']));
+        $this->accountActivationService->sendActivationEmail($user);
 
         return redirect()->route('root')
             ->with('info', 'Please check your email to activate your account.');
@@ -82,20 +75,11 @@ class UsersController extends Controller
      */
     public function activate($token)
     {
-        $user = User::where('activation_digest', $token)->first();
-
+        $user = $this->accountActivationService->activate((string) $token);
         if (!$user) {
             return redirect()->route('root')
                 ->with('danger', 'Invalid activation link.');
         }
-
-        $user->update([
-            'activated' => true,
-            'activated_at' => now(),
-            'activation_digest' => null,
-        ]);
-
-        Auth::login($user);
 
         return redirect()->route('users.show', $user)
             ->with('success', 'Account activated successfully!');
@@ -106,7 +90,7 @@ class UsersController extends Controller
      */
     public function show(User $user)
     {
-        $microposts = $user->microposts()->paginate(10);
+        $microposts = $this->userService->paginateMicroposts($user, 10);
 
         return view('users.show', [
             'user' => $user,
@@ -139,16 +123,7 @@ class UsersController extends Controller
             'password' => 'nullable|min:6|confirmed',
         ]);
 
-        $userData = [
-            'name' => $request->name,
-            'email' => $request->email,
-        ];
-
-        if ($request->password) {
-            $userData['password'] = Hash::make($request->password);
-        }
-
-        $user->update($userData);
+        $this->userService->update($user, $request->only(['name', 'email', 'password']));
 
         return redirect()->route('users.show', $user)
             ->with('success', 'Profile updated successfully!');
@@ -161,7 +136,7 @@ class UsersController extends Controller
     {
         $this->authorize('delete', $user);
 
-        $user->delete();
+        $this->userService->delete($user);
 
         return redirect()->route('users.index')
             ->with('success', 'User deleted successfully.');
@@ -172,7 +147,7 @@ class UsersController extends Controller
      */
     public function following(User $user)
     {
-        $users = $user->following()->paginate(10);
+        $users = $this->userService->paginateFollowing($user, 10);
         $title = 'Following';
 
         return view('users.show_follow', [
@@ -187,7 +162,7 @@ class UsersController extends Controller
      */
     public function followers(User $user)
     {
-        $users = $user->followers()->paginate(10);
+        $users = $this->userService->paginateFollowers($user, 10);
         $title = 'Followers';
 
         return view('users.show_follow', [

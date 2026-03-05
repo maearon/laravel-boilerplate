@@ -3,20 +3,17 @@
 namespace App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
-use App\Models\User;
+use App\Services\PasswordResetService;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Str;
-use App\Mail\PasswordReset;
-use Illuminate\Support\Facades\Mail;
 
 class PasswordResetsController extends Controller
 {
+    public function __construct(
+        private readonly PasswordResetService $passwordResetService,
+    ) {
     /**
      * Create a new controller instance.
      */
-    public function __construct()
-    {
         $this->middleware('guest');
     }
 
@@ -37,12 +34,7 @@ class PasswordResetsController extends Controller
             'email' => 'required|email|exists:users,email',
         ]);
 
-        $user = User::where('email', $request->email)->first();
-        $user->reset_digest = Str::random(60);
-        $user->reset_sent_at = now();
-        $user->save();
-
-        Mail::to($user->email)->send(new PasswordReset($user));
+        $this->passwordResetService->sendResetLink($request->string('email')->toString());
 
         return redirect()->route('password.email')
             ->with('info', 'Email sent with password reset instructions');
@@ -53,9 +45,7 @@ class PasswordResetsController extends Controller
      */
     public function edit($token)
     {
-        $user = User::where('reset_digest', $token)
-                    ->where('reset_sent_at', '>', now()->subHours(2))
-                    ->first();
+        $user = $this->passwordResetService->findValidUserByResetDigest((string) $token, 2);
 
         if (!$user) {
             return redirect()->route('password.email')
@@ -79,20 +69,17 @@ class PasswordResetsController extends Controller
             'token' => 'required',
         ]);
 
-        $user = User::where('email', $request->email)
-                    ->where('reset_digest', $request->token)
-                    ->where('reset_sent_at', '>', now()->subHours(2))
-                    ->first();
+        $user = $this->passwordResetService->resetPassword(
+            $request->string('email')->toString(),
+            $request->string('token')->toString(),
+            $request->string('password')->toString(),
+            2
+        );
 
         if (!$user) {
             return redirect()->route('password.email')
                 ->with('danger', 'Invalid password reset token or token has expired.');
         }
-
-        $user->password = Hash::make($request->password);
-        $user->reset_digest = null;
-        $user->reset_sent_at = null;
-        $user->save();
 
         return redirect()->route('login')
             ->with('success', 'Password has been reset successfully.');

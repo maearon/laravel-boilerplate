@@ -3,23 +3,22 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
+use App\Services\StaticPageService;
 
 class StaticPagesController extends Controller
 {
+    public function __construct(
+        private readonly StaticPageService $staticPageService,
+    ) {}
+
     /**
      * Show the home page.
      */
     public function home()
     {
-        if (Auth::check()) {
-            $microposts = Auth::user()->feed();
-            $micropost = new \App\Models\Micropost();
-
-            return view('static_pages.home', [
-                'microposts' => $microposts,
-                'micropost' => $micropost,
-            ]);
+        $data = $this->staticPageService->homeDataFor(auth()->user());
+        if (!empty($data)) {
+            return view('static_pages.home', $data);
         }
 
         return view('static_pages.home');

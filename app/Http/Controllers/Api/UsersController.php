@@ -4,18 +4,22 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Models\User;
+use App\Services\UserService;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Hash;
 use App\Http\Resources\UserResource;
 
 class UsersController extends Controller
 {
+    public function __construct(
+        private readonly UserService $userService,
+    ) {}
+
     /**
      * Display a listing of the users.
      */
     public function index()
     {
-        $users = User::where('activated', true)->paginate(10);
+        $users = $this->userService->paginateActivated(10);
         // return response()->json($users);
         return UserResource::collection($users);
     }
@@ -31,13 +35,7 @@ class UsersController extends Controller
             'password' => 'required|min:6',
         ]);
 
-        $user = User::create([
-            'name' => $request->name,
-            'email' => $request->email,
-            'password' => Hash::make($request->password),
-            'activated' => true,
-            'activated_at' => now(),
-        ]);
+        $user = $this->userService->createActivated($request->only(['name', 'email', 'password']));
 
         return response()->json($user, 201);
     }
@@ -60,17 +58,7 @@ class UsersController extends Controller
             'email' => 'required|email|max:255|unique:users,email,' . $user->id,
             'password' => 'nullable|min:6',
         ]);
-
-        $userData = [
-            'name' => $request->name,
-            'email' => $request->email,
-        ];
-
-        if ($request->password) {
-            $userData['password'] = Hash::make($request->password);
-        }
-
-        $user->update($userData);
+        $this->userService->update($user, $request->only(['name', 'email', 'password']));
 
         return response()->json($user);
     }
@@ -80,7 +68,7 @@ class UsersController extends Controller
      */
     public function destroy(User $user)
     {
-        $user->delete();
+        $this->userService->delete($user);
         return response()->json(null, 204);
     }
 
@@ -89,7 +77,7 @@ class UsersController extends Controller
      */
     public function microposts(User $user)
     {
-        $microposts = $user->microposts()->paginate(10);
+        $microposts = $this->userService->paginateMicroposts($user, 10);
         return response()->json($microposts);
     }
 
@@ -98,7 +86,7 @@ class UsersController extends Controller
      */
     public function following(User $user)
     {
-        $following = $user->following()->paginate(10);
+        $following = $this->userService->paginateFollowing($user, 10);
         return response()->json($following);
     }
 
@@ -107,7 +95,7 @@ class UsersController extends Controller
      */
     public function followers(User $user)
     {
-        $followers = $user->followers()->paginate(10);
+        $followers = $this->userService->paginateFollowers($user, 10);
         return response()->json($followers);
     }
 }

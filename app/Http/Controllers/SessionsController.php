@@ -3,16 +3,17 @@
 namespace App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
+use App\Services\WebSessionService;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 
 class SessionsController extends Controller
 {
+    public function __construct(
+        private readonly WebSessionService $webSessionService,
+    ) {
     /**
      * Create a new controller instance.
      */
-    public function __construct()
-    {
         $this->middleware('guest', [
             'only' => ['create']
         ]);
@@ -37,19 +38,21 @@ class SessionsController extends Controller
             'password' => 'required',
         ]);
 
-        $credentials = $request->only('email', 'password');
         $remember = $request->has('remember');
 
-        if (Auth::attempt($credentials, $remember)) {
-            $user = Auth::user();
+        $result = $this->webSessionService->attempt(
+            $request->string('email')->toString(),
+            $request->string('password')->toString(),
+            $remember
+        );
 
-            if (!$user->activated) {
-                Auth::logout();
-                return redirect()->route('root')
-                    ->with('warning', 'Your account is not activated. Please check your email for the activation link.');
-            }
+        if (($result['inactive'] ?? false) === true) {
+            return redirect()->route('root')
+                ->with('warning', 'Your account is not activated. Please check your email for the activation link.');
+        }
 
-            return redirect()->intended(route('users.show', Auth::id()))
+        if (($result['authenticated'] ?? false) === true) {
+            return redirect()->intended(route('users.show', auth()->id()))
                 ->with('success', 'Welcome back!');
         }
 
@@ -63,7 +66,7 @@ class SessionsController extends Controller
      */
     public function destroy()
     {
-        Auth::logout();
+        $this->webSessionService->logout();
 
         return redirect()->route('root')
             ->with('success', 'You have been logged out.');

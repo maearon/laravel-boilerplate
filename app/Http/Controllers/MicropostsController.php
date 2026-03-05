@@ -4,17 +4,17 @@ namespace App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
 use App\Models\Micropost;
+use App\Services\MicropostService;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Storage;
 
 class MicropostsController extends Controller
 {
+    public function __construct(
+        private readonly MicropostService $micropostService,
+    ) {
     /**
      * Create a new controller instance.
      */
-    public function __construct()
-    {
         $this->middleware('auth');
     }
 
@@ -28,17 +28,11 @@ class MicropostsController extends Controller
             'image' => 'nullable|image|max:5120', // 5MB max
         ]);
 
-        $micropost = new Micropost([
-            'content' => $request->content,
-            'user_id' => Auth::id(),
-        ]);
-
-        if ($request->hasFile('image')) {
-            $path = $request->file('image')->store('microposts', 'public');
-            $micropost->image = $path;
-        }
-
-        $micropost->save();
+        $this->micropostService->createForUser(
+            $request->user()->id,
+            $request->string('content')->toString(),
+            $request->file('image'),
+        );
 
         return redirect()->route('root')
             ->with('success', 'Micropost created!');
@@ -50,12 +44,7 @@ class MicropostsController extends Controller
     public function destroy(Micropost $micropost)
     {
         $this->authorize('delete', $micropost);
-
-        if ($micropost->image) {
-            Storage::disk('public')->delete($micropost->image);
-        }
-
-        $micropost->delete();
+        $this->micropostService->delete($micropost);
 
         return back()->with('success', 'Micropost deleted!');
     }

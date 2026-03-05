@@ -3,17 +3,18 @@
 namespace App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
-use App\Models\User;
+use App\Services\RelationshipService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
 class RelationshipsController extends Controller
 {
+    public function __construct(
+        private readonly RelationshipService $relationshipService,
+    ) {
     /**
      * Create a new controller instance.
      */
-    public function __construct()
-    {
         $this->middleware('auth');
     }
 
@@ -22,8 +23,7 @@ class RelationshipsController extends Controller
      */
     public function store(Request $request)
     {
-        $user = User::findOrFail($request->followed_id);
-        Auth::user()->follow($user);
+        $this->relationshipService->follow(Auth::user(), (int) $request->input('followed_id'));
 
         if ($request->wantsJson()) {
             return response()->json(['success' => true]);
@@ -37,8 +37,7 @@ class RelationshipsController extends Controller
      */
     public function destroy(Request $request)
     {
-        $user = User::findOrFail($request->followed_id);
-        Auth::user()->unfollow($user);
+        $this->relationshipService->unfollow(Auth::user(), (int) $request->input('followed_id'));
 
         if ($request->wantsJson()) {
             return response()->json(['success' => true]);

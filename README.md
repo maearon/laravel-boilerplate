@@ -95,6 +95,19 @@ The Laravel application follows the MVC architecture:
 
 The application is designed to be easily deployable and maintainable, with a clean separation of concerns and adherence to Laravel best practices.
 
+# Repository Pattern
+Controller
+   ↓
+Service (UserService)
+   ↓ inject
+UserRepositoryInterface
+   ↓ bind (defined in Provider)
+UserRepository (Implementation)
+   ↓
+Eloquent Model (User)
+   ↓
+Database
+
 # Commands
 php artisan vendor:publish --provider="Laravel\Sanctum\SanctumServiceProvider"
 php artisan migrate (personal_access_tokens)

@@ -4,18 +4,21 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Models\Micropost;
+use App\Services\MicropostService;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Storage;
 
 class MicropostsController extends Controller
 {
+    public function __construct(
+        private readonly MicropostService $micropostService,
+    ) {}
+
     /**
      * Display a listing of the microposts.
      */
     public function index()
     {
-        $microposts = Micropost::with('user')->latest()->paginate(10);
+        $microposts = $this->micropostService->paginateLatestWithUser(10);
         return response()->json($microposts);
     }
 
@@ -29,17 +32,11 @@ class MicropostsController extends Controller
             'image' => 'nullable|image|max:5120', // 5MB max
         ]);
 
-        $micropost = new Micropost([
-            'content' => $request->content,
-            'user_id' => Auth::id(),
-        ]);
-
-        if ($request->hasFile('image')) {
-            $path = $request->file('image')->store('microposts', 'public');
-            $micropost->image = $path;
-        }
-
-        $micropost->save();
+        $micropost = $this->micropostService->createForUser(
+            $request->user()->id,
+            $request->string('content')->toString(),
+            $request->file('image'),
+        );
 
         return response()->json($micropost, 201);
     }
@@ -63,9 +60,7 @@ class MicropostsController extends Controller
             'content' => 'required|max:140',
         ]);
 
-        $micropost->update([
-            'content' => $request->content,
-        ]);
+        $this->micropostService->updateContent($micropost, $request->string('content')->toString());
 
         return response()->json($micropost);
     }
@@ -76,12 +71,7 @@ class MicropostsController extends Controller
     public function destroy(Micropost $micropost)
     {
         $this->authorize('delete', $micropost);
-
-        if ($micropost->image) {
-            Storage::disk('public')->delete($micropost->image);
-        }
-
-        $micropost->delete();
+        $this->micropostService->delete($micropost);
 
         return response()->json(null, 204);
     }
