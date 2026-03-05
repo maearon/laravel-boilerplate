@@ -5,7 +5,7 @@
             <span class="navbar-toggler-icon"></span>
         </button>
         <div class="collapse navbar-collapse" id="navbarSupportedContent">
-            <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+            <ul class="navbar-nav ms-auto mb-2 mb-lg-0"> {{-- This is a comment --}} <!-- ms-auto: margin-left auto, shifts the element to the right, me-auto is margin-right auto, margin-right auto, shifts the element to the left -->
                 <li class="nav-item">
                     <a class="nav-link {{ request()->routeIs('root') ? 'active' : '' }}" href="{{ route('root') }}">Home</a>
                 </li>
