@@ -9,7 +9,7 @@
         {{ $users->links() }}
     </div>
 
-    <ul class="users">
+    <ul class="users list-unstyled">
         @foreach ($users as $user)
             @include('shared.user')
         @endforeach

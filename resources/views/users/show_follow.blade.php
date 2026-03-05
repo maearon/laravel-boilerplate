@@ -17,9 +17,9 @@
         </aside>
         <div class="col-md-8">
             <h3>{{ $title }}</h3>
-            
+
             @if ($users->count() > 0)
-                <ul class="users follow">
+                <ul class="users follow list-unstyled">
                     @foreach ($users as $user)
                         @include('shared.user')
                     @endforeach
