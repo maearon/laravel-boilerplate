@@ -9,6 +9,12 @@ return new class extends Migration
 {
     private function indexExists(string $table, string $index): bool
     {
+        // In testing we use SQLite in-memory, which does not have information_schema.
+        // Safely short-circuit for non-MySQL drivers so tests can run without errors.
+        if (DB::getDriverName() !== 'mysql') {
+            return false;
+        }
+
         $result = DB::selectOne(
             "SELECT COUNT(*) as c FROM information_schema.statistics 
              WHERE table_schema = DATABASE() AND table_name = ? AND index_name = ?",
