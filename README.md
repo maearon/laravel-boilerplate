@@ -112,6 +112,8 @@ Database
 php artisan vendor:publish --provider="Laravel\Sanctum\SanctumServiceProvider"
 php artisan migrate (personal_access_tokens)
 php artisan make:resource UserResource
+php artisan optimize
+php artisan route:clear
 php artisan serve
 php artisan key:generate
 php artisan config:clear

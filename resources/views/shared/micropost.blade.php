@@ -5,22 +5,31 @@
                 <div class="flex-grow-1">
                     <h5 class="card-title">{{ $micropost->user->name }}</h5>
                     <p class="card-text">{{ $micropost->content }}</p>
-                    
+
                     @if ($micropost->image)
                         <div class="mt-2">
                             <img src="{{ asset('storage/' . $micropost->image) }}" alt="Micropost image" class="img-fluid">
                         </div>
                     @endif
-                    
+
                     <small class="text-muted">Posted {{ $micropost->created_at->diffForHumans() }}</small>
                 </div>
-                
-                @if (Auth::check() && Auth::id() === $micropost->user_id)
+
+                {{-- @if (Auth::check() && Auth::id() === $micropost->user_id) --}}
+                @can('delete', $micropost)
                     <div>
                         <form method="POST" action="{{ route('microposts.destroy', $micropost) }}">
                             @csrf
                             @method('DELETE')
-                            <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Are you sure?')">Delete</button>
+                            <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Are you sure?')">
+                                @can('delete', $micropost)
+                                    @if(Auth::id() === $micropost->user_id)
+                                        🗑 Delete
+                                    @else
+                                        ⚠ Admin Delete
+                                    @endif
+                                @endcan
+                            </button>
                         </form>
                     </div>
                 @endif

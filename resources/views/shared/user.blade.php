@@ -21,7 +21,15 @@
                     @csrf
                     @method('DELETE')
                     <button type="submit" class="btn btn-sm btn-danger"
-                        onclick="return confirm('Are you sure?')">Delete</button>
+                        onclick="return confirm('Are you sure?')">
+                        @can('delete', $user)
+                            @if(Auth::id() === $user->id)
+                                🗑 Delete
+                            @else
+                                ⚠ Admin Delete
+                            @endif
+                        @endcan
+                    </button>
                 </form>
             </div>
         @endif

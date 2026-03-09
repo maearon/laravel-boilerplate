@@ -23,6 +23,7 @@ class MicropostPolicy
      */
     public function delete(User $user, Micropost $micropost)
     {
+        // dd(auth()->user()->admin);
         return $user->id === $micropost->user_id || $user->admin;
     }
 }
