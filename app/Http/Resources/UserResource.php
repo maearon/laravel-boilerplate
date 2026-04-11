@@ -7,20 +7,21 @@ use Illuminate\Http\Resources\Json\JsonResource;
 
 class UserResource extends JsonResource
 {
+    use Concerns\Gravatar;
+
     /**
-     * Transform the resource into an array.
-     *
      * @return array<string, mixed>
      */
     public function toArray(Request $request): array
     {
-        // return parent::toArray($request);
         return [
             'id' => $this->id,
             'name' => $this->name,
+            'username' => $this->name,
             'email' => $this->email,
             'activated' => $this->activated,
-            'created_at' => $this->created_at?->toDateTimeString(),
+            'createdAt' => $this->created_at?->toIso8601String(),
+            'gravatar' => self::gravatarUrl($this->email, 80),
         ];
     }
 }

@@ -3,6 +3,8 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Resources\LoginResponseResource;
+use Illuminate\Http\JsonResponse;
 use App\Services\AuthService;
 use Illuminate\Http\Request;
 
@@ -27,7 +29,7 @@ class SessionsController extends Controller
             $request->string('password')->toString(),
         );
 
-        return response()->json($result);
+        return new LoginResponseResource($result);
     }
 
     /**
@@ -37,6 +39,6 @@ class SessionsController extends Controller
     {
         $request->user()->currentAccessToken()->delete();
 
-        return response()->json(['message' => 'Logged out successfully']);
+        return new JsonResponse(['message' => 'Logged out successfully']);
     }
 }

@@ -222,7 +222,10 @@ class CacheService
     /**
      * Remember current user (API /user) - short TTL for freshness.
      */
-    public function rememberCurrentUser(int $userId, callable $callback): User
+    /**
+     * @return mixed Cached payload (array or User) for API /user.
+     */
+    public function rememberCurrentUser(int $userId, callable $callback): mixed
     {
         return Cache::remember(
             "current_user:{$userId}",

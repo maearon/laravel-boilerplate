@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Resources\CurrentUserResource;
 use App\Services\CacheService;
 use Illuminate\Http\Request;
 
@@ -18,8 +19,12 @@ class CurrentUserController extends Controller
     public function show(Request $request)
     {
         $user = $request->user();
-        $cached = $this->cacheService->rememberCurrentUser($user->id, fn () => $user);
+        $cached = $this->cacheService->rememberCurrentUser($user->id, function () use ($user) {
+            $user->loadCount(['microposts', 'following', 'followers']);
 
-        return response()->json($cached);
+            return $user;
+        });
+
+        return new CurrentUserResource($cached);
     }
 }

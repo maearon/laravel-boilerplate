@@ -7,6 +7,8 @@ use App\Models\User;
 use App\Services\CacheService;
 use App\Services\UserService;
 use Illuminate\Http\Request;
+use App\Http\Resources\MicropostResource;
+use App\Http\Resources\UserProfileResource;
 use App\Http\Resources\UserResource;
 
 class UsersController extends Controller
@@ -41,17 +43,22 @@ class UsersController extends Controller
 
         $user = $this->userService->createActivated($request->only(['name', 'email', 'password']));
 
-        return response()->json($user, 201);
+        return (new UserResource($user))->response()->setStatusCode(201);
     }
 
     /**
-     * Display the specified user.
+     * Display the specified user (stats + optional follow state when authenticated).
      */
-    public function show(User $user)
+    public function show(Request $request, User $user)
     {
-        $user = $this->cacheService->rememberUserProfile($user->id, fn () => $user->toArray());
+        $userModel = $this->cacheService->rememberUserProfile($user->id, function () use ($user) {
+            $fresh = User::query()->findOrFail($user->id);
+            $fresh->loadCount(['following', 'followers', 'microposts']);
 
-        return response()->json($user);
+            return $fresh;
+        });
+
+        return new UserProfileResource($userModel);
     }
 
     /**
@@ -66,7 +73,7 @@ class UsersController extends Controller
         ]);
         $this->userService->update($user, $request->only(['name', 'email', 'password']));
 
-        return response()->json($user);
+        return new UserResource($user->fresh());
     }
 
     /**
@@ -87,7 +94,7 @@ class UsersController extends Controller
         $page = (int) $request->get('page', 1);
         $microposts = $this->cacheService->rememberUserMicroposts($user->id, $perPage, $page);
 
-        return response()->json($microposts);
+        return MicropostResource::collection($microposts);
     }
 
     /**
@@ -99,7 +106,7 @@ class UsersController extends Controller
         $page = (int) $request->get('page', 1);
         $following = $this->cacheService->rememberUserFollowing($user->id, $perPage, $page);
 
-        return response()->json($following);
+        return UserResource::collection($following);
     }
 
     /**
@@ -111,6 +118,6 @@ class UsersController extends Controller
         $page = (int) $request->get('page', 1);
         $followers = $this->cacheService->rememberUserFollowers($user->id, $perPage, $page);
 
-        return response()->json($followers);
+        return UserResource::collection($followers);
     }
 }

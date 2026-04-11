@@ -5,6 +5,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\UsersController;
 use App\Http\Controllers\Api\MicropostsController;
 use App\Http\Controllers\Api\SessionsController;
+use App\Http\Controllers\Api\RelationshipsController;
 
 /*
 |--------------------------------------------------------------------------
@@ -17,12 +18,14 @@ Route::middleware('throttle:login')->group(function () {
     Route::post('/login', [SessionsController::class, 'login']);
 });
 
+// Public registration (SPA signup)
+Route::post('/register', [UsersController::class, 'store']);
+
 // Protected routes (throttle:api applied by default)
 Route::middleware('auth:sanctum')->group(function () {
     Route::post('/logout', [SessionsController::class, 'logout']);
 
     Route::get('/users', [UsersController::class, 'index']);
-    Route::post('/users', [UsersController::class, 'store']);
     Route::get('/users/{user}', [UsersController::class, 'show']);
     Route::put('/users/{user}', [UsersController::class, 'update']);
     Route::delete('/users/{user}', [UsersController::class, 'destroy']);
@@ -38,4 +41,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::delete('/microposts/{micropost}', [MicropostsController::class, 'destroy']);
 
     Route::get('/user', [\App\Http\Controllers\Api\CurrentUserController::class, 'show']);
+
+    Route::post('/relationships', [RelationshipsController::class, 'store']);
+    Route::delete('/relationships', [RelationshipsController::class, 'destroy']);
 });

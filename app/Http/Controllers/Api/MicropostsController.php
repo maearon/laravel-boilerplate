@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Resources\MicropostResource;
 use App\Models\Micropost;
 use App\Services\CacheService;
 use App\Services\MicropostService;
@@ -24,7 +25,7 @@ class MicropostsController extends Controller
         $page = (int) $request->get('page', 1);
         $microposts = $this->cacheService->rememberMicropostsIndex($perPage, $page);
 
-        return response()->json($microposts);
+        return MicropostResource::collection($microposts);
     }
 
     /**
@@ -43,7 +44,9 @@ class MicropostsController extends Controller
             $request->file('image'),
         );
 
-        return response()->json($micropost, 201);
+        $micropost->load('user:id,name,email');
+
+        return (new MicropostResource($micropost))->response()->setStatusCode(201);
     }
 
     /**
@@ -51,13 +54,13 @@ class MicropostsController extends Controller
      */
     public function show(Micropost $micropost)
     {
-        $data = $this->cacheService->rememberMicropostShow($micropost->id, function () use ($micropost) {
+        $model = $this->cacheService->rememberMicropostShow($micropost->id, function () use ($micropost) {
             $micropost->loadMissing('user:id,name,email');
 
-            return $micropost->toArray();
+            return $micropost;
         });
 
-        return response()->json($data);
+        return new MicropostResource($model);
     }
 
     /**
@@ -73,7 +76,9 @@ class MicropostsController extends Controller
 
         $this->micropostService->updateContent($micropost, $request->string('content')->toString());
 
-        return response()->json($micropost);
+        $micropost->load('user:id,name,email');
+
+        return new MicropostResource($micropost);
     }
 
     /**

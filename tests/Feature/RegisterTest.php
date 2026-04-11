@@ -18,13 +18,10 @@ class RegisterTest extends TestCase
         Mail::fake();
         Queue::fake();
 
-        // Use API registration which we know persists the user in this codebase.
-        $response = $this->actingAs(User::factory()->create(['activated' => true]))
-            ->postJson('/api/users', [
+        $response = $this->postJson('/api/register', [
             'name' => 'Manh',
             'email' => 'manh@example.com',
             'password' => 'password',
-            'password_confirmation' => 'password',
         ]);
 
         $response->assertStatus(201);

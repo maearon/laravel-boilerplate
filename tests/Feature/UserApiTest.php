@@ -47,15 +47,13 @@ class UserApiTest extends TestCase
 
     public function test_authenticated_can_create_user(): void
     {
-        $this->authenticate();
-
         $payload = [
             'name' => 'API User',
             'email' => 'apiuser@example.com',
             'password' => 'password',
         ];
 
-        $response = $this->postJson('/api/users', $payload);
+        $response = $this->postJson('/api/register', $payload);
 
         $response
             ->assertStatus(201)
@@ -63,7 +61,8 @@ class UserApiTest extends TestCase
                 'id',
                 'name',
                 'email',
-                'created_at',
+                'createdAt',
+                'gravatar',
             ]);
 
         $this->assertDatabaseHas('users', [
@@ -73,9 +72,7 @@ class UserApiTest extends TestCase
 
     public function test_create_user_validation_errors(): void
     {
-        $this->authenticate();
-
-        $response = $this->postJson('/api/users', [
+        $response = $this->postJson('/api/register', [
             'name' => '',
             'email' => 'not-an-email',
             'password' => '123',
