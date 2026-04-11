@@ -119,6 +119,7 @@ php artisan key:generate
 php artisan config:clear
 php artisan cache:clear
 php artisan queue:work
+php artisan storage:link
 
 Ok mình nói thẳng luôn nhé 👇
 Với JD này và còn 1 tuần, nếu ôn đúng trọng tâm thì vẫn kịp cho level Middle, còn Senior thì phụ thuộc nền tảng hiện tại của bạn.
