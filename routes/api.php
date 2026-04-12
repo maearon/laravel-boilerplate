@@ -6,6 +6,7 @@ use App\Http\Controllers\Api\UsersController;
 use App\Http\Controllers\Api\MicropostsController;
 use App\Http\Controllers\Api\SessionsController;
 use App\Http\Controllers\Api\RelationshipsController;
+use App\Http\Controllers\Api\PasswordResetsController;
 
 /*
 |--------------------------------------------------------------------------
@@ -20,6 +21,10 @@ Route::middleware('throttle:login')->group(function () {
 
 // Public registration (SPA signup)
 Route::post('/register', [UsersController::class, 'store']);
+
+// Password resets
+Route::post('/password_resets', [PasswordResetsController::class, 'store'])->name('password.email.store');
+Route::patch('/password_resets/edit/{token}', [PasswordResetsController::class, 'update'])->name('password.update');
 
 // Protected routes (throttle:api applied by default)
 Route::middleware('auth:sanctum')->group(function () {
