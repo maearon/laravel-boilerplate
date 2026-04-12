@@ -7,6 +7,7 @@ use App\Http\Controllers\Api\MicropostsController;
 use App\Http\Controllers\Api\SessionsController;
 use App\Http\Controllers\Api\RelationshipsController;
 use App\Http\Controllers\Api\PasswordResetsController;
+use App\Http\Controllers\Api\AccountActivationsController;
 
 /*
 |--------------------------------------------------------------------------
@@ -25,6 +26,10 @@ Route::post('/register', [UsersController::class, 'store']);
 // Password resets
 Route::post('/password_resets', [PasswordResetsController::class, 'store'])->name('password.email.store');
 Route::patch('/password_resets/edit/{token}', [PasswordResetsController::class, 'update'])->name('password.update');
+
+// Account activations
+Route::post('/account_activations', [\App\Http\Controllers\Api\AccountActivationsController::class, 'store'])->name('account_activations.store');
+Route::patch('/account_activations/edit/{token}', [\App\Http\Controllers\Api\AccountActivationsController::class, 'update'])->name('account_activations.update');
 
 // Protected routes (throttle:api applied by default)
 Route::middleware('auth:sanctum')->group(function () {

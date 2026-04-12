@@ -28,6 +28,9 @@ class AccountActivationService
 
     public function sendActivationEmail(User $user): void
     {
+        // 🔥 FIX: luôn tạo lại token khi gửi mail
+        $user->activation_digest = \Illuminate\Support\Str::random(60);
+        $user->save();
         Mail::to($user->email)->queue(new AccountActivation($user));
     }
 
